@@ -13,7 +13,7 @@
 // 3. Base64: 'data:image/png;base64,iVBOR...'
 // 4. Dejar vacío '' para no mostrar logo
 
-const LOGO_URL = 'logo dark.png';  // ← Cambia esto por la ruta de tu logo
+const LOGO_URL = 'logo.png';  // ← Cambia esto por la ruta de tu logo
 
 // ============================================
 // USUARIOS Y CONTRASEÑAS
