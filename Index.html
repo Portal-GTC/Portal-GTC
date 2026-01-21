@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grupo Termo Control - Portal 2026</title>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #141927;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --text-primary: #e8edf4;
+            --text-secondary: #9ca3af;
+            --border-color: #2d3548;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Outfit', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* Login */
+        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+        .login-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; padding: 3rem; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .form-input { width: 100%; padding: 12px; margin: 10px 0; background: #1e2535; border: 1px solid var(--border-color); border-radius: 10px; color: white; outline: none; }
+
+        /* Dashboard */
+        .dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .dashboard.active { display: block; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+
+        .admin-notice { background: rgba(0, 212, 255, 0.1); border: 1px solid var(--accent-primary); padding: 1rem; border-radius: 12px; margin-bottom: 2rem; }
+
+        /* Cards */
+        .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        .report-card { background: var(--bg-secondary); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
+        .report-card:hover { border-color: var(--accent-primary); transform: translateY(-5px); }
+
+        .btn { padding: 12px 24px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; text-decoration: none; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white; width: 100%; }
+        .btn-logout { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+
+        /* Viewer */
+        .viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; }
+        .viewer-header { height: 60px; background: #141927; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
+        iframe { width: 100%; height: calc(100% - 60px); border: none; }
+    </style>
+</head>
+<body>
+
+    <div class="login-container" id="loginScreen">
+        <div class="login-box">
+            <img src="" id="loginLogo" crossorigin="anonymous" class="login-logo" style="max-width: 180px; margin-bottom: 1.5rem;" alt="Logo">
+            <h1 class="gradient-text" style="font-size: 1.8rem; display: block; margin-bottom: 1.5rem;">Grupo Termo Control</h1>
+            <input type="text" id="username" placeholder="Usuario" class="form-input">
+            <input type="password" id="password" placeholder="Contraseña" class="form-input">
+            <button class="btn btn-primary" onclick="handleLogin()">Entrar</button>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <header class="header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <img src="" id="dashLogo" crossorigin="anonymous" style="height: 45px;" alt="Logo">
+                <h2 class="gradient-text">Reportes GTC</h2>
+            </div>
+            <button class="btn btn-logout" onclick="location.reload()">Cerrar Sesión</button>
+        </header>
+
+        <div id="adminPanel" class="admin-notice" style="display: none;">
+            <p><strong>Modo Administrador:</strong> Los cambios en el Excel se reflejan automáticamente.</p>
+            <a id="sheetLink" href="#" target="_blank" style="color: var(--accent-primary); font-size: 0.9rem;">✎ Editar Base de Datos en Excel</a>
+        </div>
+
+        <div class="reports-grid" id="reportsGrid"></div>
+    </div>
+
+    <div id="viewer" class="viewer">
+        <div class="viewer-header">
+            <span id="reportTitle">Cargando...</span>
+            <button class="btn btn-logout" style="color: #ff4d4d; border-color: #ff4d4d;" onclick="closeViewer()">CERRAR</button>
+        </div>
+        <iframe id="reportIframe" src=""></iframe>
+    </div>
+
+     <script src="config.js"></script>
+    <script>
+        const CLOUD_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQkDn_E9a98dRguVQ2BSgneozirmQkywCJFdKGtrKUZOdg6CURttocYbtbhLQlW1jJft6P08BHdAmtP/pub?output=csv'; 
+        const EXCEL_EDIT_URL = 'https://docs.google.com/spreadsheets/d/1xyW5L4JfGWPXELzinpWCBjNfjQRdsAB9SSRreQ0gS6U/edit';
+
+        let sessionUser = "";
+
+document.addEventListener('DOMContentLoaded', () => {
+    const l1 = document.getElementById('loginLogo');
+    const l2 = document.getElementById('dashLogo');
+    
+    if (typeof LOGO_URL !== 'undefined' && LOGO_URL !== "") {
+        if(l1) l1.src = LOGO_URL;
+        if(l2) l2.src = LOGO_URL;
+        
+        // Verificación en consola para 2026
+        console.log("Intentando cargar logo desde:", LOGO_URL);
+    }
+});
+
+        async function handleLogin() {
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value.trim();
+
+            if (USERS[u] && USERS[u].password === p) {
+                sessionUser = u;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').classList.add('active');
+                
+                if (USERS[u].role === 'admin') {
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('sheetLink').href = EXCEL_EDIT_URL;
+                }
+                await fetchCloudReports();
+            } else {
+                alert("Credenciales incorrectas");
+            }
+        }
+
+        async function fetchCloudReports() {
+            try {
+                const response = await fetch(CLOUD_CSV, { cache: "no-store" });
+                const csvText = await response.text();
+                
+                // Dividir por líneas
+                const lines = csvText.split(/\r?\n/);
+                const grid = document.getElementById('reportsGrid');
+                grid.innerHTML = "";
+
+                for (let i = 1; i < lines.length; i++) {
+                    if (!lines[i].trim()) continue;
+
+                    // Separación simple por comas
+                    const columns = lines[i].split(',');
+                    
+                    if (columns.length < 3) continue;
+
+                    // Limpieza total de comillas y espacios
+                    const userInSheet = columns[0].replace(/['"]+/g, '').trim().toLowerCase();
+                    const reportName  = columns[1].replace(/['"]+/g, '').trim();
+                    const reportUrl   = columns[2].replace(/['"]+/g, '').trim();
+                    
+                    const currentUser = sessionUser.toLowerCase().trim();
+
+                    // Lógica de visualización
+                    if (userInSheet === currentUser || USERS[sessionUser].role === 'admin') {
+                        const card = document.createElement('div');
+                        card.className = 'report-card';
+                        card.innerHTML = `
+                            <h3 style="margin-bottom: 10px; color: var(--accent-primary)">${reportName}</h3>
+                            <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 15px;">Usuario: ${userInSheet}</p>
+                            <button class="btn btn-primary" style="width:100%" onclick="openViewer('${reportUrl}', '${reportName}')">Abrir Reporte</button>
+                        `;
+                        grid.appendChild(card);
+                    }
+                }
+
+                if (grid.innerHTML === "") {
+                    grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: var(--text-secondary);'>No se encontraron reportes asignados.</p>";
+                }
+
+            } catch (e) {
+                console.error("Error:", e);
+                document.getElementById('reportsGrid').innerHTML = "<p style='color:red;'>Error de conexión con la base de datos.</p>";
+            }
+        }
+
+        function openViewer(url, title) {
+            document.getElementById('reportTitle').innerText = title;
+            document.getElementById('reportIframe').src = url;
+            document.getElementById('viewer').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeViewer() {
+            document.getElementById('viewer').style.display = 'none';
+            document.getElementById('reportIframe').src = "";
+            document.body.style.overflow = 'auto';
+        }
+    </script>
