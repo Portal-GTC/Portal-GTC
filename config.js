@@ -36,6 +36,11 @@ const USERS = {
         password: 'Control30',  // ← Cambia esta contraseña
         role: 'user'
     }
+    ,
+    'ktrolle': {
+        password: 'Control40',  // ← Cambia esta contraseña
+        role: 'user'
+    }
     // Agrega más usuarios aquí siguiendo el mismo formato
 };
 
