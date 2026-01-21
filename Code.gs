@@ -100,7 +100,7 @@ function getReports(username) {
     }
     
     // Abrir el Google Sheet
-    const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Hoja 1');
+    const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName('URL');
     
     if (!sheet) {
       return createResponse(false, 'No se encontró la hoja de datos');
