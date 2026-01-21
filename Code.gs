@@ -9,27 +9,32 @@ const SHEET_ID = '1xyW5L4JfGWPXELzinpWCBjNfjQRdsAB9SSRreQ0gS6U';
 // USUARIOS Y CONTRASEÑAS (Seguros en el servidor de Google)
 const USERS = {
   'admin': {
-    password: 'admin123',
+    password: 'Franco13',
     role: 'admin'
   },
-  'usuario1': {
-    password: 'pass123',
+  'ktrolle': {
+    password: 'Control40',
     role: 'user'
   },
-  'usuario2': {
-    password: 'pass456',
+  'acarreon': {
+    password: 'Control20',
+    role: 'user'
+  }
+,
+  'dmartinezs': {
+    password: 'Control10',
     role: 'user'
   }
 };
 
 // URL del logo (opcional)
-const LOGO_URL = 'https://i.imgur.com/tuLogoAqui.png';
+const LOGO_URL = 'logo.png';
 
 /**
  * Configurar la Web App para que sea accesible
  */
 function doGet(e) {
-  return HtmlService.createHtmlOutputFromFile('Index')
+  return HtmlService.createHtmlOutputFromFile('index')
     .setTitle('Portal GTC')
     .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
