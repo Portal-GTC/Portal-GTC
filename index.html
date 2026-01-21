@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grupo Termo Control - Portal 2026</title>
-    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <title>Grupo Termo Control</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #0a0e1a;
@@ -17,7 +17,13 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Outfit', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; overflow-x: hidden; }
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+        }
 
         .gradient-text {
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
@@ -28,158 +34,457 @@
         }
 
         /* Login */
-        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
-        .login-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; padding: 3rem; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .form-input { width: 100%; padding: 12px; margin: 10px 0; background: #1e2535; border: 1px solid var(--border-color); border-radius: 10px; color: white; outline: none; }
+        .login-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 2rem; 
+        }
+        
+        .login-box { 
+            background: var(--bg-secondary); 
+            border: 1px solid var(--border-color); 
+            border-radius: 24px; 
+            padding: 3rem; 
+            width: 100%; 
+            max-width: 400px; 
+            text-align: center; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+        }
+        
+        .login-logo {
+            max-width: 180px; 
+            margin-bottom: 1.5rem;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .form-input { 
+            width: 100%; 
+            padding: 12px; 
+            margin: 10px 0; 
+            background: #1e2535; 
+            border: 1px solid var(--border-color); 
+            border-radius: 10px; 
+            color: white; 
+            outline: none;
+            font-family: inherit;
+        }
+        
+        .form-input:focus {
+            border-color: var(--accent-primary);
+        }
+
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
         /* Dashboard */
-        .dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .dashboard { 
+            display: none; 
+            padding: 2rem; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        
         .dashboard.active { display: block; }
-        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 2rem; }
+        
+        .header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 1px solid var(--border-color); 
+            padding-bottom: 1.5rem; 
+            margin-bottom: 2rem; 
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
 
-        .admin-notice { background: rgba(0, 212, 255, 0.1); border: 1px solid var(--accent-primary); padding: 1rem; border-radius: 12px; margin-bottom: 2rem; }
+        .admin-notice { 
+            background: rgba(0, 212, 255, 0.1); 
+            border: 1px solid var(--accent-primary); 
+            padding: 1rem; 
+            border-radius: 12px; 
+            margin-bottom: 2rem; 
+        }
 
         /* Cards */
-        .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
-        .report-card { background: var(--bg-secondary); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
-        .report-card:hover { border-color: var(--accent-primary); transform: translateY(-5px); }
+        .reports-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 1.5rem; 
+        }
+        
+        .report-card { 
+            background: var(--bg-secondary); 
+            padding: 1.5rem; 
+            border-radius: 20px; 
+            border: 1px solid var(--border-color); 
+            transition: 0.3s; 
+        }
+        
+        .report-card:hover { 
+            border-color: var(--accent-primary); 
+            transform: translateY(-5px); 
+        }
 
-        .btn { padding: 12px 24px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; text-decoration: none; }
-        .btn-primary { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white; width: 100%; }
-        .btn-logout { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn { 
+            padding: 12px 24px; 
+            border-radius: 10px; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            text-decoration: none;
+            font-family: inherit;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); 
+            color: white; 
+            width: 100%; 
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-logout { 
+            background: transparent; 
+            border: 1px solid var(--border-color); 
+            color: var(--text-secondary); 
+        }
+        
+        .btn-logout:hover {
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
+        
+        .btn-back { 
+            background: transparent; 
+            border: 1px solid var(--accent-primary); 
+            color: var(--accent-primary); 
+        }
+        
+        .btn-back:hover { 
+            background: rgba(0, 212, 255, 0.1); 
+        }
 
         /* Viewer */
-        .viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; }
-        .viewer-header { height: 60px; background: #141927; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
-        iframe { width: 100%; height: calc(100% - 60px); border: none; }
+        .viewer { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: #000; 
+            z-index: 9999; 
+        }
+        
+        .viewer-header { 
+            height: 60px; 
+            background: #141927; 
+            display: flex; 
+            align-items: center; 
+            padding: 0 20px; 
+            justify-content: space-between; 
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .viewer-controls { 
+            display: flex; 
+            gap: 10px; 
+        }
+        
+        iframe { 
+            width: 100%; 
+            height: calc(100% - 60px); 
+            border: none; 
+        }
+
+        /* Error message */
+        .error-message {
+            color: #ff4d4d;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-box {
+                padding: 2rem;
+            }
+            
+            .dashboard {
+                padding: 1rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .viewer-controls {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 <body>
 
+    <!-- PANTALLA DE LOGIN -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
-            <img src="" id="loginLogo" crossorigin="anonymous" class="login-logo" style="max-width: 180px; margin-bottom: 1.5rem;" alt="Logo">
-            <h1 class="gradient-text" style="font-size: 1.8rem; display: block; margin-bottom: 1.5rem;">Grupo Termo Control</h1>
-            <input type="text" id="username" placeholder="Usuario" class="form-input">
-            <input type="password" id="password" placeholder="Contraseña" class="form-input">
-            <button class="btn btn-primary" onclick="handleLogin()">Entrar</button>
+            <img src="" id="loginLogo" class="login-logo" alt="Logo" style="display: none;">
+            <h1 class="gradient-text" style="font-size: 1.8rem; display: block; margin-bottom: 1.5rem;">
+                Grupo Termo Control
+            </h1>
+            <input type="text" id="username" placeholder="Usuario" class="form-input" autocomplete="username">
+            <input type="password" id="password" placeholder="Contraseña" class="form-input" autocomplete="current-password">
+            <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">Entrar</button>
+            <div class="error-message" id="loginError"></div>
         </div>
     </div>
 
+    <!-- DASHBOARD -->
     <div class="dashboard" id="dashboard">
         <header class="header">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <img src="" id="dashLogo" crossorigin="anonymous" style="height: 45px;" alt="Logo">
+                <img src="" id="dashLogo" style="height: 45px; display: none;" alt="Logo">
                 <h2 class="gradient-text">Reportes GTC</h2>
             </div>
-            <button class="btn btn-logout" onclick="location.reload()">Cerrar Sesión</button>
+            <button class="btn btn-logout" onclick="logout()">Cerrar Sesión</button>
         </header>
 
         <div id="adminPanel" class="admin-notice" style="display: none;">
             <p><strong>Modo Administrador:</strong> Los cambios en el Excel se reflejan automáticamente.</p>
-            <a id="sheetLink" href="#" target="_blank" style="color: var(--accent-primary); font-size: 0.9rem;">✎ Editar Base de Datos en Excel</a>
+            <a id="sheetLink" href="#" target="_blank" style="color: var(--accent-primary); font-size: 0.9rem;">
+                ✎ Editar Base de Datos en Excel
+            </a>
         </div>
 
-        <div class="reports-grid" id="reportsGrid"></div>
+        <div class="reports-grid" id="reportsGrid">
+            <p style="text-align: center; color: var(--text-secondary);">Cargando reportes...</p>
+        </div>
     </div>
 
+    <!-- VISOR DE REPORTES -->
     <div id="viewer" class="viewer">
         <div class="viewer-header">
             <span id="reportTitle">Cargando...</span>
-            <button class="btn btn-logout" style="color: #ff4d4d; border-color: #ff4d4d;" onclick="closeViewer()">CERRAR</button>
+            <div class="viewer-controls">
+                <button class="btn btn-back" onclick="closeViewer()">← Volver</button>
+                <button class="btn btn-logout" style="color: #ff4d4d; border-color: #ff4d4d;" onclick="logout()">
+                    Cerrar Sesión
+                </button>
+            </div>
         </div>
         <iframe id="reportIframe" src=""></iframe>
     </div>
 
-     <script src="config.js"></script>
     <script>
-        const CLOUD_CSV = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQkDn_E9a98dRguVQ2BSgneozirmQkywCJFdKGtrKUZOdg6CURttocYbtbhLQlW1jJft6P08BHdAmtP/pub?output=csv'; 
-        const EXCEL_EDIT_URL = 'https://docs.google.com/spreadsheets/d/1xyW5L4JfGWPXELzinpWCBjNfjQRdsAB9SSRreQ0gS6U/edit';
-
-        let sessionUser = "";
-
-document.addEventListener('DOMContentLoaded', () => {
-    const l1 = document.getElementById('loginLogo');
-    const l2 = document.getElementById('dashLogo');
-    
-    if (typeof LOGO_URL !== 'undefined' && LOGO_URL !== "") {
-        if(l1) l1.src = LOGO_URL;
-        if(l2) l2.src = LOGO_URL;
+        // ============================================
+        // WEB APP Google
+        // ============================================
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzlMYkC4RabQ05_BSfGU6AaijOgZV-D0cLJcXbp4OIa-cfJEMjkSTzNLIv101MaRLb1Cw/exec';
         
-        // Verificación en consola para 2026
-        console.log("Intentando cargar logo desde:", LOGO_URL);
-    }
-});
+        // Variables globales
+        let sessionUser = "";
+        let sessionRole = "";
 
-        async function handleLogin() {
-            const u = document.getElementById('username').value.trim();
-            const p = document.getElementById('password').value.trim();
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Cargar logo
+            await loadLogo();
+            
+            // Permitir login con Enter
+            document.getElementById('password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+        });
 
-            if (USERS[u] && USERS[u].password === p) {
-                sessionUser = u;
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('dashboard').classList.add('active');
-                
-                if (USERS[u].role === 'admin') {
-                    document.getElementById('adminPanel').style.display = 'block';
-                    document.getElementById('sheetLink').href = EXCEL_EDIT_URL;
-                }
-                await fetchCloudReports();
-            } else {
-                alert("Credenciales incorrectas");
-            }
-        }
-
-        async function fetchCloudReports() {
+        // ============================================
+        // FUNCIONES DE API
+        // ============================================
+        
+        async function apiCall(action, data = {}) {
             try {
-                const response = await fetch(CLOUD_CSV, { cache: "no-store" });
-                const csvText = await response.text();
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: action,
+                        ...data
+                    })
+                });
                 
-                // Dividir por líneas
-                const lines = csvText.split(/\r?\n/);
-                const grid = document.getElementById('reportsGrid');
-                grid.innerHTML = "";
-
-                for (let i = 1; i < lines.length; i++) {
-                    if (!lines[i].trim()) continue;
-
-                    // Separación simple por comas
-                    const columns = lines[i].split(',');
-                    
-                    if (columns.length < 3) continue;
-
-                    // Limpieza total de comillas y espacios
-                    const userInSheet = columns[0].replace(/['"]+/g, '').trim().toLowerCase();
-                    const reportName  = columns[1].replace(/['"]+/g, '').trim();
-                    const reportUrl   = columns[2].replace(/['"]+/g, '').trim();
-                    
-                    const currentUser = sessionUser.toLowerCase().trim();
-
-                    // Lógica de visualización
-                    if (userInSheet === currentUser || USERS[sessionUser].role === 'admin') {
-                        const card = document.createElement('div');
-                        card.className = 'report-card';
-                        card.innerHTML = `
-                            <h3 style="margin-bottom: 10px; color: var(--accent-primary)">${reportName}</h3>
-                            <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 15px;">Usuario: ${userInSheet}</p>
-                            <button class="btn btn-primary" style="width:100%" onclick="openViewer('${reportUrl}', '${reportName}')">Abrir Reporte</button>
-                        `;
-                        grid.appendChild(card);
-                    }
-                }
-
-                if (grid.innerHTML === "") {
-                    grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: var(--text-secondary);'>No se encontraron reportes asignados.</p>";
-                }
-
-            } catch (e) {
-                console.error("Error:", e);
-                document.getElementById('reportsGrid').innerHTML = "<p style='color:red;'>Error de conexión con la base de datos.</p>";
+                return await response.json();
+            } catch (error) {
+                console.error('Error en llamada API:', error);
+                return {
+                    success: false,
+                    message: 'Error de conexión con el servidor'
+                };
             }
         }
 
+        async function loadLogo() {
+            try {
+                const result = await apiCall('getLogo');
+                if (result.success && result.data.logoUrl) {
+                    const loginLogo = document.getElementById('loginLogo');
+                    const dashLogo = document.getElementById('dashLogo');
+                    
+                    loginLogo.src = result.data.logoUrl;
+                    dashLogo.src = result.data.logoUrl;
+                    loginLogo.style.display = 'block';
+                    dashLogo.style.display = 'block';
+                }
+            } catch (error) {
+                console.log('Logo no disponible');
+            }
+        }
+
+        // ============================================
+        // LOGIN
+        // ============================================
+        
+        async function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const loginBtn = document.getElementById('loginBtn');
+            const errorMsg = document.getElementById('loginError');
+            
+            // Validación básica
+            if (!username || !password) {
+                showError('Por favor ingresa usuario y contraseña');
+                return;
+            }
+            
+            // Deshabilitar botón y mostrar cargando
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = 'Entrando...<span class="spinner"></span>';
+            errorMsg.classList.remove('show');
+            
+            try {
+                // Llamar al backend
+                const result = await apiCall('login', { username, password });
+                
+                if (result.success) {
+                    sessionUser = result.data.username;
+                    sessionRole = result.data.role;
+                    
+                    // Cambiar a dashboard
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('dashboard').classList.add('active');
+                    
+                    // Cargar reportes
+                    await loadReports();
+                } else {
+                    showError(result.message);
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Entrar';
+                }
+            } catch (error) {
+                showError('Error de conexión. Intenta de nuevo.');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Entrar';
+            }
+        }
+
+        function showError(message) {
+            const errorMsg = document.getElementById('loginError');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+        }
+
+        // ============================================
+        // REPORTES
+        // ============================================
+        
+        async function loadReports() {
+            const grid = document.getElementById('reportsGrid');
+            grid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Cargando reportes...</p>';
+            
+            try {
+                const result = await apiCall('getReports', { username: sessionUser });
+                
+                if (!result.success) {
+                    grid.innerHTML = `<p style="color: #ff4d4d; text-align: center;">${result.message}</p>`;
+                    return;
+                }
+                
+                // Mostrar panel de admin si aplica
+                if (result.data.isAdmin) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('sheetLink').href = result.data.sheetUrl;
+                }
+                
+                // Renderizar reportes
+                const reports = result.data.reports;
+                
+                if (reports.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No se encontraron reportes asignados.</p>';
+                    return;
+                }
+                
+                grid.innerHTML = '';
+                
+                reports.forEach(report => {
+                    const card = document.createElement('div');
+                    card.className = 'report-card';
+                    card.innerHTML = `
+                        <h3 style="margin-bottom: 10px; color: var(--accent-primary)">${escapeHtml(report.name)}</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 15px;">
+                            Usuario: ${escapeHtml(report.user)}
+                        </p>
+                        <button class="btn btn-primary" onclick="openViewer('${escapeHtml(report.url)}', '${escapeHtml(report.name)}')">
+                            Abrir Reporte
+                        </button>
+                    `;
+                    grid.appendChild(card);
+                });
+                
+            } catch (error) {
+                grid.innerHTML = '<p style="color: #ff4d4d; text-align: center;">Error al cargar reportes. Intenta de nuevo.</p>';
+            }
+        }
+
+        // ============================================
+        // VISOR
+        // ============================================
+        
         function openViewer(url, title) {
-            document.getElementById('reportTitle').innerText = title;
+            document.getElementById('reportTitle').textContent = title;
             document.getElementById('reportIframe').src = url;
             document.getElementById('viewer').style.display = 'block';
             document.body.style.overflow = 'hidden';
@@ -187,7 +492,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         function closeViewer() {
             document.getElementById('viewer').style.display = 'none';
-            document.getElementById('reportIframe').src = "";
+            document.getElementById('reportIframe').src = '';
             document.body.style.overflow = 'auto';
         }
+
+        // ============================================
+        // UTILIDADES
+        // ============================================
+        
+        function logout() {
+            sessionUser = '';
+            sessionRole = '';
+            location.reload();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
     </script>
+</body>
+</html>
