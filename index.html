@@ -53,12 +53,51 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
         }
         
-        .login-logo {
+        /* Logo con transición suave */
+        .login-logo, .dash-logo {
             max-width: 180px; 
             margin-bottom: 1.5rem;
-            display: block;
+            display: none;
             margin-left: auto;
             margin-right: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .login-logo.loaded, .dash-logo.loaded {
+            display: block;
+            opacity: 1;
+        }
+        
+        .dash-logo {
+            height: 45px;
+            max-width: none;
+            margin: 0;
+        }
+        
+        /* Skeleton loader para el logo */
+        .logo-skeleton {
+            width: 180px;
+            height: 60px;
+            background: linear-gradient(90deg, #1e2535 25%, #2d3548 50%, #1e2535 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .dash-logo-skeleton {
+            width: 120px;
+            height: 45px;
+            background: linear-gradient(90deg, #1e2535 25%, #2d3548 50%, #1e2535 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
         
         .form-input { 
@@ -263,7 +302,8 @@
     <!-- PANTALLA DE LOGIN -->
     <div class="login-container" id="loginScreen">
         <div class="login-box">
-            <img src="" id="loginLogo" class="login-logo" alt="Logo" style="display: none;">
+            <div id="loginLogoSkeleton" class="logo-skeleton"></div>
+            <img src="" id="loginLogo" class="login-logo" alt="Logo">
             <h1 class="gradient-text" style="font-size: 1.8rem; display: block; margin-bottom: 1.5rem;">
                 Grupo Termo Control
             </h1>
@@ -278,7 +318,8 @@
     <div class="dashboard" id="dashboard">
         <header class="header">
             <div style="display: flex; align-items: center; gap: 15px;">
-                <img src="" id="dashLogo" style="height: 45px; display: none;" alt="Logo">
+                <div id="dashLogoSkeleton" class="dash-logo-skeleton" style="display: none;"></div>
+                <img src="" id="dashLogo" class="dash-logo" alt="Logo">
                 <h2 class="gradient-text">Reportes GTC</h2>
             </div>
             <button class="btn btn-logout" onclick="logout()">Cerrar Sesión</button>
@@ -314,18 +355,19 @@
         // ============================================
         // WEB APP Google
         // ============================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyelbgDCJhtaUeMg6LxKbtvBEF5mP8Vcc2FhlDzZbWbplTLAeP-MXuHSMjn6tces5hqoA/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzlMYkC4RabQ05_BSfGU6AaijOgZV-D0cLJcXbp4OIa-cfJEMjkSTzNLIv101MaRLb1Cw/exec';
         
         // Variables globales
         let sessionUser = "";
         let sessionRole = "";
+        let logoCache = null; // Cache del logo
 
         // ============================================
         // INICIALIZACIÓN
         // ============================================
         document.addEventListener('DOMContentLoaded', async () => {
-            // Cargar logo
-            await loadLogo();
+            // Cargar logo inmediatamente
+            loadLogo();
             
             // Permitir login con Enter
             document.getElementById('password').addEventListener('keypress', (e) => {
@@ -358,20 +400,63 @@
         }
 
         async function loadLogo() {
+            // Si ya tenemos el logo en cache, usarlo inmediatamente
+            if (logoCache) {
+                setLogo(logoCache);
+                return;
+            }
+            
             try {
                 const result = await apiCall('getLogo');
                 if (result.success && result.data.logoUrl) {
-                    const loginLogo = document.getElementById('loginLogo');
-                    const dashLogo = document.getElementById('dashLogo');
+                    logoCache = result.data.logoUrl;
                     
-                    loginLogo.src = result.data.logoUrl;
-                    dashLogo.src = result.data.logoUrl;
-                    loginLogo.style.display = 'block';
-                    dashLogo.style.display = 'block';
+                    // Precargar la imagen
+                    const img = new Image();
+                    img.onload = () => {
+                        setLogo(logoCache);
+                    };
+                    img.onerror = () => {
+                        // Si falla, ocultar skeleton
+                        hideSkeleton();
+                    };
+                    img.src = logoCache;
+                } else {
+                    hideSkeleton();
                 }
             } catch (error) {
                 console.log('Logo no disponible');
+                hideSkeleton();
             }
+        }
+        
+        function setLogo(url) {
+            const loginLogo = document.getElementById('loginLogo');
+            const dashLogo = document.getElementById('dashLogo');
+            const loginSkeleton = document.getElementById('loginLogoSkeleton');
+            const dashSkeleton = document.getElementById('dashLogoSkeleton');
+            
+            // Establecer la URL
+            loginLogo.src = url;
+            dashLogo.src = url;
+            
+            // Mostrar logos con animación
+            setTimeout(() => {
+                loginLogo.classList.add('loaded');
+                dashLogo.classList.add('loaded');
+                
+                // Ocultar skeletons
+                if (loginSkeleton) loginSkeleton.style.display = 'none';
+                if (dashSkeleton) dashSkeleton.style.display = 'none';
+            }, 50);
+        }
+        
+        function hideSkeleton() {
+            const loginSkeleton = document.getElementById('loginLogoSkeleton');
+            const dashSkeleton = document.getElementById('dashLogoSkeleton');
+            
+            if (loginSkeleton) loginSkeleton.style.display = 'none';
+            if (dashSkeleton) dashSkeleton.style.display = 'none';
         }
 
         // ============================================
@@ -406,6 +491,13 @@
                     // Cambiar a dashboard
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('dashboard').classList.add('active');
+                    
+                    // Si ya tenemos el logo cacheado, mostrarlo inmediatamente
+                    if (logoCache) {
+                        const dashSkeleton = document.getElementById('dashLogoSkeleton');
+                        if (dashSkeleton) dashSkeleton.style.display = 'block';
+                        setLogo(logoCache);
+                    }
                     
                     // Cargar reportes
                     await loadReports();
