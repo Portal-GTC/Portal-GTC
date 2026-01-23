@@ -4,7 +4,7 @@
 // ========================================
 
 // CONFIGURACIÓN: Reemplaza con el ID de tu Google Sheet
-const SHEET_ID = '1xyW5L4JfGWPXELzinpWCBjNfjQRdsAB9SSRreQ0gS6U';
+const SHEET_ID = 'AKfycbz_IsZY0bpk4BwxtJatXpAx58zzzgEoCIpLNPifhjnTjd1yGLsfhq7VgkzVUepdS0P24A';
 
 // USUARIOS Y CONTRASEÑAS (Seguros en el servidor de Google)
 const USERS = {
