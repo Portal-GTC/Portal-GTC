@@ -9,7 +9,7 @@ const SHEET_ID = 'AKfycbz_IsZY0bpk4BwxtJatXpAx58zzzgEoCIpLNPifhjnTjd1yGLsfhq7Vgk
 // USUARIOS Y CONTRASEÑAS (Seguros en el servidor de Google)
 const USERS = {
   'admin': {
-    password: 'Franco13',
+    password: 'Zeus13',
     role: 'admin'
   },
   'ktrolle': {
