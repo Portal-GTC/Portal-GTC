@@ -1,8 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Grupo Termo Control</title>
+    <link href="https://fonts.googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0e1a;
+            --bg-secondary: #141927;
+            --accent-primary: #00d4ff;
+            --accent-secondary: #7c3aed;
+            --text-primary: #e8edf4;
+            --text-secondary: #9ca3af;
+            --border-color: #2d3548;
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Outfit', sans-serif; 
+            background: var(--bg-primary); 
+            color: var(--text-primary); 
+            min-height: 100vh; 
+            overflow-x: hidden; 
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            background-clip: text; 
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        /* Login */
+        .login-container { 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+            padding: 2rem; 
+        }
+        
+        .login-box { 
+            background: var(--bg-secondary); 
+            border: 1px solid var(--border-color); 
+            border-radius: 24px; 
+            padding: 3rem; 
+            width: 100%; 
+            max-width: 400px; 
+            text-align: center; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
+        }
+        
+        .login-logo, .dash-logo {
+            max-width: 180px; 
+            margin-bottom: 1.5rem;
+            display: none;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .login-logo.loaded, .dash-logo.loaded {
+            display: block;
+            opacity: 1;
+        }
+        
+        .dash-logo { height: 45px; max-width: none; margin: 0; }
+        
+        .logo-skeleton {
+            width: 180px; height: 60px;
+            background: linear-gradient(90deg, #1e2535 25%, #2d3548 50%, #1e2535 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .dash-logo-skeleton {
+            width: 120px; height: 45px;
+            background: linear-gradient(90deg, #1e2535 25%, #2d3548 50%, #1e2535 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
+        .form-input { 
+            width: 100%; padding: 12px; margin: 10px 0; 
+            background: #1e2535; border: 1px solid var(--border-color); 
+            border-radius: 10px; color: white; outline: none;
+            font-family: inherit;
+        }
+        
+        .form-input:focus { border-color: var(--accent-primary); }
+
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 20px; height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        .dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .dashboard.active { display: block; }
+        
+        .header { 
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; 
+            margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
+        }
+
+        .admin-notice { 
+            background: rgba(0, 212, 255, 0.1); border: 1px solid var(--accent-primary); 
+            padding: 1rem; border-radius: 12px; margin-bottom: 2rem; 
+        }
+
+        .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
+        
+        .report-card { 
+            background: var(--bg-secondary); padding: 1.5rem; border-radius: 20px; 
+            border: 1px solid var(--border-color); transition: 0.3s; 
+        }
+        
+        .report-card:hover { border-color: var(--accent-primary); transform: translateY(-5px); }
+
+        .btn { 
+            padding: 12px 24px; border-radius: 10px; border: none; 
+            font-weight: bold; cursor: pointer; transition: 0.3s; 
+            text-decoration: none; font-family: inherit;
+        }
+        
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white; width: 100%; }
+        .btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
+        .btn-logout { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
+        .btn-logout:hover { border-color: #ff4d4d; color: #ff4d4d; }
+        .btn-back { background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary); }
+        .btn-back:hover { background: rgba(0, 212, 255, 0.1); }
+
+        .viewer { 
+            display: none; position: fixed; top: 0; left: 0; 
+            width: 100%; height: 100%; background: #000; z-index: 9999; 
+            overflow: hidden;
+        }
+        
+        .viewer-header { 
+            height: 60px; background: #141927; display: flex; 
+            align-items: center; padding: 0 20px; justify-content: space-between; 
+            flex-wrap: wrap; gap: 10px;
+        }
+
+        .error-message { color: #ff4d4d; font-size: 0.9rem; margin-top: 10px; display: none; }
+        .error-message.show { display: block; }
     </style>
 </head>
 <body>
-    <!-- LOGIN -->
     <div id="loginView" class="login-container">
         <div class="login-box">
             <div id="loginLogoSkeleton" class="logo-skeleton"></div>
@@ -17,7 +182,6 @@
         </div>
     </div>
 
-    <!-- DASHBOARD -->
     <div id="dashboardView" class="dashboard">
         <div class="header">
             <div style="display: flex; align-items: center; gap: 1rem;">
@@ -31,23 +195,19 @@
         <div id="reportGrid" class="reports-grid"></div>
     </div>
 
-    <!-- VISOR -->
     <div id="viewerView" class="viewer">
         <div class="viewer-header">
             <h2 id="reportTitle" class="gradient-text" style="font-size: 1.2rem;"></h2>
-            <div class="viewer-controls">
-                <button class="btn btn-back" onclick="closeReport()">Volver</button>
-            </div>
+            <button class="btn btn-back" onclick="closeReport()">Volver</button>
         </div>
-        <!-- Contenedor para inyectar el Shadow DOM -->
-        <div id="reportFrameContainer" style="width: 100%; height: 100%;"></div>
+        <div id="reportFrameContainer" style="width: 100%; height: calc(100% - 60px);"></div>
     </div>
 
     <script>
         const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI/exec';
         let currentUser = null;
 
-        window.onload = async () => {
+        window.onload = () => {
             document.getElementById('loginForm').onsubmit = handleLogin;
             fetchLogo();
         };
@@ -62,11 +222,12 @@
                         img.src = res.data.logoUrl;
                         img.onload = () => {
                             img.classList.add('loaded');
-                            document.querySelectorAll('.logo-skeleton, .dash-logo-skeleton')[i].style.display = 'none';
+                            const skeletons = [document.getElementById('loginLogoSkeleton'), document.getElementById('dashLogoSkeleton')];
+                            if(skeletons[i]) skeletons[i].style.display = 'none';
                         };
                     });
                 }
-            } catch(e) { console.error("Logo error"); }
+            } catch(e) {}
         }
 
         async function handleLogin(e) {
@@ -74,7 +235,7 @@
             const btn = document.getElementById('loginBtn');
             const err = document.getElementById('loginError');
             btn.disabled = true;
-            btn.innerHTML = 'Validando... <div class="spinner"></div>';
+            btn.innerHTML = 'Accediendo... <div class="spinner"></div>';
             
             try {
                 const user = document.getElementById('username').value;
@@ -91,10 +252,9 @@
                     document.getElementById('dashboardView').classList.add('active');
                     loadReports();
                 } else {
-                    err.textContent = res.message;
-                    err.classList.add('show');
+                    err.textContent = res.message; err.classList.add('show');
                 }
-            } catch(e) { err.textContent = "Error de conexión"; err.classList.add('show'); }
+            } catch(e) { err.textContent = "Error de servidor"; err.classList.add('show'); }
             btn.disabled = false; btn.textContent = 'Entrar al Portal';
         }
 
@@ -111,8 +271,8 @@
                 res.data.reports.forEach(report => {
                     const card = document.createElement('div');
                     card.className = 'report-card';
-                    card.innerHTML = `<h3 style="margin: 1.5rem 0">${report.name}</h3>
-                        <button class="btn btn-primary" style="margin-bottom:1.5rem" onclick="openReport('${report.url}', '${report.name}')">Ver Reporte</button>`;
+                    card.innerHTML = `<h3 style="margin-bottom: 1.5rem">${report.name}</h3>
+                        <button class="btn btn-primary" onclick="openReport('${report.url}', '${report.name}')">Ver Reporte</button>`;
                     grid.appendChild(card);
                 });
                 if(res.data.isAdmin) {
@@ -127,15 +287,10 @@
             document.getElementById('reportTitle').textContent = name;
             const container = document.getElementById('reportFrameContainer');
             container.innerHTML = '';
-            
-            // SEGURIDAD: Creamos Shadow Root cerrado
             const shadow = container.attachShadow({mode: 'closed'});
             const iframe = document.createElement('iframe');
-            
-            iframe.src = atob(payload); // Decodifica al vuelo
-            iframe.setAttribute('style', 'width:100%; height:calc(100% - 10px); margin-bottom:-80px; border:none;');
-            iframe.setAttribute('referrerpolicy', 'no-referrer');
-            
+            iframe.src = atob(payload);
+            iframe.setAttribute('style', 'width:100%; height:100%; border:none; margin-bottom:-80px;');
             shadow.appendChild(iframe);
             document.getElementById('viewerView').style.display = 'block';
         }
