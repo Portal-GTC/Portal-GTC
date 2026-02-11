@@ -1,19 +1,30 @@
 <script>
-    // URL de tu Web App de Google Apps Script (Debe terminar en /exec)
-    const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT'; 
+    // 1. CONFIGURACIÓN ÚNICA
+    const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI/exec'; 
 
     let currentUser = null;
     let sessionToken = null;
 
-    // Referencias
+    // 2. REFERENCIAS AL DOM (Asegúrate de que existan en tu HTML)
     const loginView = document.querySelector('.login-container');
     const dashboardView = document.getElementById('dashboardView');
     const viewerView = document.getElementById('viewerView');
     const reportGrid = document.getElementById('reportGrid');
 
-    // Función de Login
+    // 3. INICIALIZACIÓN (Esto evita la pantalla blanca)
+    window.onload = () => {
+        const loginForm = document.getElementById('loginForm');
+        if (loginForm) {
+            loginForm.addEventListener('submit', handleLogin);
+        } else {
+            console.error("No se encontró el elemento 'loginForm'");
+        }
+    };
+
+    // 4. FUNCIÓN DE LOGIN
     async function handleLogin(e) {
         if(e) e.preventDefault();
+        
         const user = document.getElementById('username').value;
         const pass = document.getElementById('password').value;
         const btn = document.getElementById('loginBtn');
@@ -24,10 +35,14 @@
         errorMsg.classList.remove('show');
 
         try {
+            // Usamos 'no-cors' no es opción aquí porque necesitamos el JSON, 
+            // pero Google requiere manejar la redirección manualmente a veces.
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
+                mode: 'cors', // Forzar CORS
                 body: JSON.stringify({ action: 'login', username: user, password: pass })
             });
+            
             const result = await response.json();
 
             if (result.success) {
@@ -43,7 +58,8 @@
                 errorMsg.classList.add('show');
             }
         } catch (err) {
-            errorMsg.textContent = "Error de conexión.";
+            console.error("Error detallado:", err);
+            errorMsg.textContent = "Error de conexión con Google Apps Script.";
             errorMsg.classList.add('show');
         } finally {
             btn.disabled = false;
@@ -51,12 +67,13 @@
         }
     }
 
-    // Cargar reportes desde el backend
+    // 5. CARGAR REPORTES
     async function loadReports() {
         reportGrid.innerHTML = '<p>Consultando informes...</p>';
         try {
             const response = await fetch(SCRIPT_URL, {
                 method: 'POST',
+                mode: 'cors',
                 body: JSON.stringify({ 
                     action: 'getReports', 
                     username: currentUser, 
@@ -75,7 +92,7 @@
 
     function renderReports(reports) {
         reportGrid.innerHTML = '';
-        if (reports.length === 0) {
+        if (!reports || reports.length === 0) {
             reportGrid.innerHTML = '<p>No tienes reportes asignados.</p>';
             return;
         }
@@ -83,7 +100,6 @@
         reports.forEach(report => {
             const card = document.createElement('div');
             card.className = 'report-card';
-            // IMPORTANTE: report.payload es la URL en Base64 que viene del Apps Script
             card.innerHTML = `
                 <h3 style="margin-bottom:1.5rem">${report.name}</h3>
                 <button class="btn btn-primary" onclick="openReport('${report.payload}', '${report.name}')">
@@ -94,32 +110,25 @@
         });
     }
 
-    // Abrir reporte con técnica de ocultación
     function openReport(payload, name) {
         document.getElementById('reportTitle').textContent = name;
         const container = document.getElementById('reportFrameContainer');
-        
-        // Limpiar contenido previo
         container.innerHTML = '';
         
-        // Crear Shadow DOM cerrado (No aparece en el inspector de elementos normal)
         const shadow = container.attachShadow({mode: 'closed'});
-        
         const iframe = document.createElement('iframe');
+        
         try {
-            // Decodifica la URL de Power BI al vuelo
             iframe.src = atob(payload); 
             iframe.style.width = "100%";
             iframe.style.height = "100%";
             iframe.style.border = "none";
             iframe.setAttribute('referrerpolicy', 'no-referrer');
-            // Sandbox para restringir acciones del iframe
-            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
             
             shadow.appendChild(iframe);
             viewerView.style.display = 'block';
         } catch (e) {
-            alert("Error al decodificar el enlace del reporte.");
+            alert("Error al abrir reporte.");
         }
     }
 
@@ -129,6 +138,6 @@
     }
 
     function logout() {
-        location.reload(); // Forma más limpia de resetear todo el estado
+        location.reload();
     }
 </script>
