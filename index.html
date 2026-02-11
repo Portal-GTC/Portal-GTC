@@ -23,7 +23,7 @@
             background: var(--bg-primary); 
             color: var(--text-primary); 
             min-height: 100vh; 
-            overflow: hidden; 
+            overflow-x: hidden; 
         }
 
         .gradient-text {
@@ -54,6 +54,53 @@
             box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
         }
         
+        /* Logo con transición suave */
+        .login-logo, .dash-logo {
+            max-width: 180px; 
+            margin-bottom: 1.5rem;
+            display: none;
+            margin-left: auto;
+            margin-right: auto;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+        }
+        
+        .login-logo.loaded, .dash-logo.loaded {
+            display: block;
+            opacity: 1;
+        }
+        
+        .dash-logo {
+            height: 45px;
+            max-width: none;
+            margin: 0;
+        }
+        
+        /* Skeleton loader para el logo */
+        .logo-skeleton {
+            width: 180px;
+            height: 60px;
+            background: linear-gradient(90deg, #1e2535 25%, #2d3548 50%, #1e2535 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .dash-logo-skeleton {
+            width: 120px;
+            height: 45px;
+            background: linear-gradient(90deg, #1e2535 25%, #2d3548 50%, #1e2535 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 8px;
+        }
+        
+        @keyframes loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+        
         .form-input { 
             width: 100%; 
             padding: 12px; 
@@ -63,28 +110,38 @@
             border-radius: 10px; 
             color: white; 
             outline: none;
-        }
-
-        .btn { 
-            padding: 12px 24px; 
-            border-radius: 10px; 
-            border: none; 
-            font-weight: bold; 
-            cursor: pointer; 
-            transition: 0.3s;
+            font-family: inherit;
         }
         
-        .btn-primary { 
-            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); 
-            color: white; 
-            width: 100%; 
+        .form-input:focus {
+            border-color: var(--accent-primary);
         }
 
-        .error-message { color: #ff4d4d; font-size: 0.9rem; margin-top: 10px; display: none; }
-        .error-message.show { display: block; }
+        /* Loading spinner */
+        .spinner {
+            border: 3px solid var(--border-color);
+            border-top: 3px solid var(--accent-primary);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
 
         /* Dashboard */
-        .dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
+        .dashboard { 
+            display: none; 
+            padding: 2rem; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+        }
+        
         .dashboard.active { display: block; }
         
         .header { 
@@ -94,8 +151,19 @@
             border-bottom: 1px solid var(--border-color); 
             padding-bottom: 1.5rem; 
             margin-bottom: 2rem; 
+            flex-wrap: wrap;
+            gap: 1rem;
         }
 
+        .admin-notice { 
+            background: rgba(0, 212, 255, 0.1); 
+            border: 1px solid var(--accent-primary); 
+            padding: 1rem; 
+            border-radius: 12px; 
+            margin-bottom: 2rem; 
+        }
+
+        /* Cards */
         .reports-grid { 
             display: grid; 
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
@@ -107,15 +175,70 @@
             padding: 1.5rem; 
             border-radius: 20px; 
             border: 1px solid var(--border-color); 
-            text-align: center;
+            transition: 0.3s; 
+        }
+        
+        .report-card:hover { 
+            border-color: var(--accent-primary); 
+            transform: translateY(-5px); 
+        }
+
+        .btn { 
+            padding: 12px 24px; 
+            border-radius: 10px; 
+            border: none; 
+            font-weight: bold; 
+            cursor: pointer; 
+            transition: 0.3s; 
+            text-decoration: none;
+            font-family: inherit;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .btn-primary { 
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); 
+            color: white; 
+            width: 100%; 
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-logout { 
+            background: transparent; 
+            border: 1px solid var(--border-color); 
+            color: var(--text-secondary); 
+        }
+        
+        .btn-logout:hover {
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+        }
+        
+        .btn-back { 
+            background: transparent; 
+            border: 1px solid var(--accent-primary); 
+            color: var(--accent-primary); 
+        }
+        
+        .btn-back:hover { 
+            background: rgba(0, 212, 255, 0.1); 
         }
 
         /* Viewer */
         .viewer { 
             display: none; 
             position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
             background: #000; 
             z-index: 9999; 
         }
@@ -127,152 +250,374 @@
             align-items: center; 
             padding: 0 20px; 
             justify-content: space-between; 
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .viewer-controls { 
+            display: flex; 
+            gap: 10px; 
+        }
+        
+
+iframe { 
+    width: 100%; 
+    height: calc(100% - 10px); /* Ajustar altura */
+    margin-bottom: -80px; /* Ocultar toda la barra inferior */
+    border: none; 
+}
+
+.viewer {
+    display: none; 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    background: #000; 
+    z-index: 9999;
+    overflow: hidden; /* Crítico para ocultar el overflow */
+}
+
+        /* Error message */
+        .error-message {
+            color: #ff4d4d;
+            font-size: 0.9rem;
+            margin-top: 10px;
+            display: none;
         }
 
-        .spinner {
-            border: 2px solid rgba(255,255,255,0.3);
-            border-top: 2px solid #fff;
-            border-radius: 50%;
-            width: 12px; height: 12px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-left: 8px;
+        .error-message.show {
+            display: block;
         }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .login-box {
+                padding: 2rem;
+            }
+            
+            .dashboard {
+                padding: 1rem;
+            }
+            
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .viewer-controls {
+                flex-wrap: wrap;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- LOGIN -->
-    <div class="login-container" id="loginView">
+    <!-- PANTALLA DE LOGIN -->
+    <div class="login-container" id="loginScreen">
         <div class="login-box">
-            <h2 class="gradient-text" style="margin-bottom: 2rem;">Portal GTC</h2>
-            <form id="loginForm">
-                <input type="text" id="username" class="form-input" placeholder="Usuario" required>
-                <input type="password" id="password" class="form-input" placeholder="Contraseña" required>
-                <button type="submit" id="loginBtn" class="btn btn-primary">Entrar al Portal</button>
-                <div id="loginError" class="error-message"></div>
-            </form>
+            <div id="loginLogoSkeleton" class="logo-skeleton"></div>
+            <img src="" id="loginLogo" class="login-logo" alt="Logo">
+            <h1 class="gradient-text" style="font-size: 1.8rem; display: block; margin-bottom: 1.5rem;">
+                Grupo Termo Control
+            </h1>
+            <input type="text" id="username" placeholder="Usuario" class="form-input" autocomplete="username">
+            <input type="password" id="password" placeholder="Contraseña" class="form-input" autocomplete="current-password">
+            <button class="btn btn-primary" id="loginBtn" onclick="handleLogin()">Entrar</button>
+            <div class="error-message" id="loginError"></div>
         </div>
     </div>
 
     <!-- DASHBOARD -->
-    <div id="dashboardView" class="dashboard">
-        <div class="header">
-            <h2 class="gradient-text">Bienvenido, <span id="displayUser"></span></h2>
-            <button class="btn" style="background: #2d3548; color: white;" onclick="logout()">Cerrar Sesión</button>
+    <div class="dashboard" id="dashboard">
+        <header class="header">
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div id="dashLogoSkeleton" class="dash-logo-skeleton" style="display: none;"></div>
+                <img src="" id="dashLogo" class="dash-logo" alt="Logo">
+                <h2 class="gradient-text">Reportes GTC</h2>
+            </div>
+            <button class="btn btn-logout" onclick="logout()">Cerrar Sesión</button>
+        </header>
+
+        <div id="adminPanel" class="admin-notice" style="display: none;">
+            <p><strong>Modo Administrador:</strong> Los cambios en el Excel se reflejan automáticamente.</p>
+            <a id="sheetLink" href="#" target="_blank" style="color: var(--accent-primary); font-size: 0.9rem;">
+                ✎ Editar Base de Datos en Excel
+            </a>
         </div>
-        <div id="reportGrid" class="reports-grid"></div>
+
+        <div class="reports-grid" id="reportsGrid">
+            <p style="text-align: center; color: var(--text-secondary);">Cargando reportes...</p>
+        </div>
     </div>
 
-    <!-- VISOR -->
-    <div id="viewerView" class="viewer">
+    <!-- VISOR DE REPORTES -->
+    <div id="viewer" class="viewer">
         <div class="viewer-header">
-            <h3 id="reportTitle" style="color: white;">Cargando...</h3>
-            <button class="btn" style="background: #ff4d4d; color: white;" onclick="closeReport()">Cerrar</button>
+            <span id="reportTitle">Cargando...</span>
+            <div class="viewer-controls">
+                <button class="btn btn-back" onclick="closeViewer()">← Volver</button>
+                <button class="btn btn-logout" style="color: #ff4d4d; border-color: #ff4d4d;" onclick="logout()">
+                    Cerrar Sesión
+                </button>
+            </div>
         </div>
-        <div id="reportFrameContainer" style="width:100%; height:calc(100% - 60px);"></div>
+        <iframe id="reportIframe" src=""></iframe>
     </div>
 
     <script>
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby-LAt1-k7VCsjfaa6eOXwUvNLm5ZT7FkxGLPCsDzSL9LfdVVoOq1j5RJ3Oo6j8pnW_/exec'; 
+        // ============================================
+        // WEB APP Google
+        // ============================================
+        const API_URL = 'https://script.google.com/macros/s/AKfycby-LAt1-k7VCsjfaa6eOXwUvNLm5ZT7FkxGLPCsDzSL9LfdVVoOq1j5RJ3Oo6j8pnW_/exec';
+        
+        // Variables globales
+        let sessionUser = "";
+        let sessionRole = "";
+        let logoCache = null; // Cache del logo
 
-        let currentUser = null;
-        let sessionToken = null;
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Cargar logo inmediatamente
+            loadLogo();
+            
+            // Permitir login con Enter
+            document.getElementById('password').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') handleLogin();
+            });
+        });
 
-        // Inicialización
-        window.onload = () => {
-            document.getElementById('loginForm').onsubmit = handleLogin;
-        };
+        // ============================================
+        // FUNCIONES DE API
+        // ============================================
+        
+        async function apiCall(action, data = {}) {
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: action,
+                        ...data
+                    })
+                });
+                
+                return await response.json();
+            } catch (error) {
+                console.error('Error en llamada API:', error);
+                return {
+                    success: false,
+                    message: 'Error de conexión con el servidor'
+                };
+            }
+        }
 
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
+        async function loadLogo() {
+            // Si ya tenemos el logo en cache, usarlo inmediatamente
+            if (logoCache) {
+                setLogo(logoCache);
+                return;
+            }
+            
+            try {
+                const result = await apiCall('getLogo');
+                if (result.success && result.data.logoUrl) {
+                    logoCache = result.data.logoUrl;
+                    
+                    // Precargar la imagen
+                    const img = new Image();
+                    img.onload = () => {
+                        setLogo(logoCache);
+                    };
+                    img.onerror = () => {
+                        // Si falla, ocultar skeleton
+                        hideSkeleton();
+                    };
+                    img.src = logoCache;
+                } else {
+                    hideSkeleton();
+                }
+            } catch (error) {
+                console.log('Logo no disponible');
+                hideSkeleton();
+            }
+        }
+        
+        function setLogo(url) {
+            const loginLogo = document.getElementById('loginLogo');
+            const dashLogo = document.getElementById('dashLogo');
+            const loginSkeleton = document.getElementById('loginLogoSkeleton');
+            const dashSkeleton = document.getElementById('dashLogoSkeleton');
+            
+            // Establecer la URL
+            loginLogo.src = url;
+            dashLogo.src = url;
+            
+            // Mostrar logos con animación
+            setTimeout(() => {
+                loginLogo.classList.add('loaded');
+                dashLogo.classList.add('loaded');
+                
+                // Ocultar skeletons
+                if (loginSkeleton) loginSkeleton.style.display = 'none';
+                if (dashSkeleton) dashSkeleton.style.display = 'none';
+            }, 50);
+        }
+        
+        function hideSkeleton() {
+            const loginSkeleton = document.getElementById('loginLogoSkeleton');
+            const dashSkeleton = document.getElementById('dashLogoSkeleton');
+            
+            if (loginSkeleton) loginSkeleton.style.display = 'none';
+            if (dashSkeleton) dashSkeleton.style.display = 'none';
+        }
+
+        // ============================================
+        // LOGIN
+        // ============================================
+        
+        async function handleLogin() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const loginBtn = document.getElementById('loginBtn');
             const errorMsg = document.getElementById('loginError');
             
-            btn.disabled = true;
-            btn.innerHTML = 'Validando... <div class="spinner"></div>';
+            // Validación básica
+            if (!username || !password) {
+                showError('Por favor ingresa usuario y contraseña');
+                return;
+            }
+            
+            // Deshabilitar botón y mostrar cargando
+            loginBtn.disabled = true;
+            loginBtn.innerHTML = 'Entrando...<span class="spinner"></span>';
             errorMsg.classList.remove('show');
-
+            
             try {
-                const user = document.getElementById('username').value;
-                const pass = document.getElementById('password').value;
-
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'login', username: user, password: pass })
-                });
-                const result = await response.json();
-
+                // Llamar al backend
+                const result = await apiCall('login', { username, password });
+                
                 if (result.success) {
-                    currentUser = result.data.username;
-                    sessionToken = result.data.token;
-                    document.getElementById('displayUser').textContent = currentUser;
-                    document.getElementById('loginView').style.display = 'none';
-                    document.getElementById('dashboardView').classList.add('active');
-                    loadReports();
+                    sessionUser = result.data.username;
+                    sessionRole = result.data.role;
+                    
+                    // Cambiar a dashboard
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('dashboard').classList.add('active');
+                    
+                    // Si ya tenemos el logo cacheado, mostrarlo inmediatamente
+                    if (logoCache) {
+                        const dashSkeleton = document.getElementById('dashLogoSkeleton');
+                        if (dashSkeleton) dashSkeleton.style.display = 'block';
+                        setLogo(logoCache);
+                    }
+                    
+                    // Cargar reportes
+                    await loadReports();
                 } else {
-                    errorMsg.textContent = result.message;
-                    errorMsg.classList.add('show');
-                    btn.disabled = false;
-                    btn.textContent = 'Entrar al Portal';
+                    showError(result.message);
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Entrar';
                 }
-            } catch (err) {
-                errorMsg.textContent = "Error de conexión.";
-                errorMsg.classList.add('show');
-                btn.disabled = false;
-                btn.textContent = 'Entrar al Portal';
+            } catch (error) {
+                showError('Error de conexión. Intenta de nuevo.');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Entrar';
             }
         }
 
+        function showError(message) {
+            const errorMsg = document.getElementById('loginError');
+            errorMsg.textContent = message;
+            errorMsg.classList.add('show');
+        }
+
+        // ============================================
+        // REPORTES
+        // ============================================
+        
         async function loadReports() {
-            const grid = document.getElementById('reportGrid');
-            grid.innerHTML = '<p>Cargando informes...</p>';
+            const grid = document.getElementById('reportsGrid');
+            grid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Cargando reportes...</p>';
             
             try {
-                const response = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({ action: 'getReports', username: currentUser, token: sessionToken })
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    grid.innerHTML = '';
-                    result.data.reports.forEach(report => {
-                        const card = document.createElement('div');
-                        card.className = 'report-card';
-                        card.innerHTML = `
-                            <h3 style="margin-bottom:1rem">${report.name}</h3>
-                            <button class="btn btn-primary" onclick="openReport('${report.payload}', '${report.name}')">Ver Informe</button>
-                        `;
-                        grid.appendChild(card);
-                    });
+                const result = await apiCall('getReports', { username: sessionUser });
+                
+                if (!result.success) {
+                    grid.innerHTML = `<p style="color: #ff4d4d; text-align: center;">${result.message}</p>`;
+                    return;
                 }
-            } catch (err) {
-                grid.innerHTML = '<p>Error al cargar reportes.</p>';
+                
+                // Mostrar panel de admin si aplica
+                if (result.data.isAdmin) {
+                    document.getElementById('adminPanel').style.display = 'block';
+                    document.getElementById('sheetLink').href = result.data.sheetUrl;
+                }
+                
+                // Renderizar reportes
+                const reports = result.data.reports;
+                
+                if (reports.length === 0) {
+                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No se encontraron reportes asignados.</p>';
+                    return;
+                }
+                
+                grid.innerHTML = '';
+                
+                reports.forEach(report => {
+                    const card = document.createElement('div');
+                    card.className = 'report-card';
+                    card.innerHTML = `
+                        <h3 style="margin-bottom: 10px; color: var(--accent-primary)">${escapeHtml(report.name)}</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 15px;">
+                            Usuario: ${escapeHtml(report.user)}
+                        </p>
+                        <button class="btn btn-primary" onclick="openViewer('${escapeHtml(report.url)}', '${escapeHtml(report.name)}')">
+                            Abrir Reporte
+                        </button>
+                    `;
+                    grid.appendChild(card);
+                });
+                
+            } catch (error) {
+                grid.innerHTML = '<p style="color: #ff4d4d; text-align: center;">Error al cargar reportes. Intenta de nuevo.</p>';
             }
         }
 
-        function openReport(payload, name) {
-            document.getElementById('reportTitle').textContent = name;
-            const container = document.getElementById('reportFrameContainer');
-            container.innerHTML = '';
-            
-            const shadow = container.attachShadow({mode: 'closed'});
-            const iframe = document.createElement('iframe');
-            iframe.src = atob(payload); 
-            iframe.style.width = "100%"; iframe.style.height = "100%"; iframe.style.border = "none";
-            
-            shadow.appendChild(iframe);
-            document.getElementById('viewerView').style.display = 'block';
+        // ============================================
+        // VISOR
+        // ============================================
+        
+        function openViewer(url, title) {
+            document.getElementById('reportTitle').textContent = title;
+            document.getElementById('reportIframe').src = url;
+            document.getElementById('viewer').style.display = 'block';
+            document.body.style.overflow = 'hidden';
         }
 
-        function closeReport() {
-            document.getElementById('viewerView').style.display = 'none';
-            document.getElementById('reportFrameContainer').innerHTML = '';
+        function closeViewer() {
+            document.getElementById('viewer').style.display = 'none';
+            document.getElementById('reportIframe').src = '';
+            document.body.style.overflow = 'auto';
         }
 
-        function logout() { location.reload(); }
+        // ============================================
+        // UTILIDADES
+        // ============================================
+        
+        function logout() {
+            sessionUser = '';
+            sessionRole = '';
+            location.reload();
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
     </script>
 </body>
 </html>
