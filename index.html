@@ -235,43 +235,79 @@
         } catch(e) { console.error("Error cargando logo"); }
     }
 
-    async function handleLogin(e) {
-        e.preventDefault();
-        const btn = document.getElementById('loginBtn');
-        const err = document.getElementById('loginError');
-        
-        btn.disabled = true;
-        btn.innerHTML = 'Accediendo... <div class="spinner"></div>';
-        err.classList.remove('show');
-        
-        try {
-            const user = document.getElementById('username').value;
-            const pass = document.getElementById('password').value;
-            
-            const resp = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({action: 'login', username: user, password: pass})
-            });
-            const res = await resp.json();
-            
-            if(res.success) {
-                currentUser = res.data.username;
-                document.getElementById('displayUser').textContent = currentUser;
-                document.getElementById('loginView').style.display = 'none';
-                document.getElementById('dashboardView').classList.add('active');
-                loadReports();
-            } else {
-                err.textContent = res.message; 
-                err.classList.add('show');
-            }
-        } catch(e) { 
-            err.textContent = "Error de servidor o conexión"; 
-            err.classList.add('show'); 
-        } finally {
-            btn.disabled = false; 
-            btn.textContent = 'Entrar al Portal';
-        }
+const SHEET_ID = '1xyW5L4JfGWPXELzinpWCBjNfjQRdsAB9SSRreQ0gS6U';
+
+function doGet(e) {
+  return ContentService.createTextOutput("Servicio Activo").setMimeType(ContentService.MimeType.TEXT);
+}
+
+function doPost(e) {
+  try {
+    // Si e.postData es indefinido, el fetch de GitHub no está mandando el body correctamente
+    if (!e.postData || !e.postData.contents) {
+      return createResponse(false, "Cuerpo de petición vacío");
     }
+    
+    const params = JSON.parse(e.postData.contents);
+    const action = params.action;
+    
+    if (action === 'login') return handleLogin(params.username, params.password);
+    if (action === 'getReports') return getReports(params.username);
+    if (action === 'getLogo') return createResponse(true, "Logo", {logoUrl: 'logo.png'});
+    
+    return createResponse(false, "Acción desconocida: " + action);
+  } catch (error) {
+    return createResponse(false, "Error crítico en Apps Script: " + error.toString());
+  }
+}
+
+function handleLogin(username, password) {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const sheet = ss.getSheetByName('Usuarios');
+  const data = sheet.getDataRange().getValues();
+  
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === String(username).trim() && 
+        String(data[i][1]).trim() === String(password).trim()) {
+      return createResponse(true, "OK", {username: username, role: data[i][2] || 'user'});
+    }
+  }
+  return createResponse(false, "Usuario o contraseña incorrectos");
+}
+
+function getReports(username) {
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const userRole = getUserRole(username);
+  const sheet = ss.getSheets()[0]; // Primera hoja
+  const data = sheet.getDataRange().getValues();
+  const reports = [];
+  
+  for (let i = 1; i < data.length; i++) {
+    const userInSheet = String(data[i][0]).trim().toLowerCase();
+    if (userRole === 'admin' || userInSheet === String(username).toLowerCase()) {
+      reports.push({
+        name: data[i][1],
+        payload: Utilities.base64Encode(String(data[i][2]))
+      });
+    }
+  }
+  return createResponse(true, "OK", {reports: reports, isAdmin: userRole === 'admin'});
+}
+
+function getUserRole(username) {
+  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Usuarios');
+  const data = sheet.getDataRange().getValues();
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim().toLowerCase() === String(username).toLowerCase()) return data[i][2];
+  }
+  return 'user';
+}
+
+function createResponse(success, message, data = null) {
+  const out = {success: success, message: message, data: data};
+  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
+}
+
 
     async function loadReports() {
         const grid = document.getElementById('reportGrid');
