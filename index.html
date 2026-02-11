@@ -34,135 +34,30 @@
             display: inline-block;
         }
 
-        /* Login */
-        .login-container { 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            min-height: 100vh; 
-            padding: 2rem; 
-        }
+        .login-container { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+        .login-box { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 24px; padding: 3rem; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         
-        .login-box { 
-            background: var(--bg-secondary); 
-            border: 1px solid var(--border-color); 
-            border-radius: 24px; 
-            padding: 3rem; 
-            width: 100%; 
-            max-width: 400px; 
-            text-align: center; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5); 
-        }
-        
-        .login-logo, .dash-logo {
-            max-width: 180px; 
-            margin-bottom: 1.5rem;
-            display: none;
-            margin-left: auto;
-            margin-right: auto;
-            opacity: 0;
-            transition: opacity 0.3s ease-in-out;
-        }
-        
-        .login-logo.loaded, .dash-logo.loaded {
-            display: block;
-            opacity: 1;
-        }
-        
-        .dash-logo { height: 45px; max-width: none; margin: 0; }
-        
-        .logo-skeleton {
-            width: 180px; height: 60px;
-            background: linear-gradient(90deg, #1e2535 25%, #2d3548 50%, #1e2535 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 8px;
-            margin: 0 auto 1.5rem;
-        }
-        
-        .dash-logo-skeleton {
-            width: 120px; height: 45px;
-            background: linear-gradient(90deg, #1e2535 25%, #2d3548 50%, #1e2535 75%);
-            background-size: 200% 100%;
-            animation: loading 1.5s infinite;
-            border-radius: 8px;
-        }
-        
-        @keyframes loading {
-            0% { background-position: 200% 0; }
-            100% { background-position: -200% 0; }
-        }
-        
-        .form-input { 
-            width: 100%; padding: 12px; margin: 10px 0; 
-            background: #1e2535; border: 1px solid var(--border-color); 
-            border-radius: 10px; color: white; outline: none;
-            font-family: inherit;
-        }
-        
+        .form-input { width: 100%; padding: 12px; margin: 10px 0; background: #1e2535; border: 1px solid var(--border-color); border-radius: 10px; color: white; outline: none; font-family: inherit; }
         .form-input:focus { border-color: var(--accent-primary); }
 
-        .spinner {
-            border: 3px solid var(--border-color);
-            border-top: 3px solid var(--accent-primary);
-            border-radius: 50%;
-            width: 20px; height: 20px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-            margin-left: 10px;
-        }
-        
+        .spinner { border: 3px solid var(--border-color); border-top: 3px solid var(--accent-primary); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-left: 10px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
         .dashboard { display: none; padding: 2rem; max-width: 1200px; margin: 0 auto; }
         .dashboard.active { display: block; }
         
-        .header { 
-            display: flex; justify-content: space-between; align-items: center; 
-            border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; 
-            margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem;
-        }
-
-        .admin-notice { 
-            background: rgba(0, 212, 255, 0.1); border: 1px solid var(--accent-primary); 
-            padding: 1rem; border-radius: 12px; margin-bottom: 2rem; 
-        }
-
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 2rem; flex-wrap: wrap; gap: 1rem; }
         .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; }
         
-        .report-card { 
-            background: var(--bg-secondary); padding: 1.5rem; border-radius: 20px; 
-            border: 1px solid var(--border-color); transition: 0.3s; 
-        }
-        
+        .report-card { background: var(--bg-secondary); padding: 1.5rem; border-radius: 20px; border: 1px solid var(--border-color); transition: 0.3s; }
         .report-card:hover { border-color: var(--accent-primary); transform: translateY(-5px); }
 
-        .btn { 
-            padding: 12px 24px; border-radius: 10px; border: none; 
-            font-weight: bold; cursor: pointer; transition: 0.3s; 
-            text-decoration: none; font-family: inherit;
-        }
-        
-        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn { padding: 12px 24px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; text-decoration: none; font-family: inherit; }
         .btn-primary { background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white; width: 100%; }
-        .btn-primary:hover:not(:disabled) { opacity: 0.9; transform: translateY(-2px); }
         .btn-logout { background: transparent; border: 1px solid var(--border-color); color: var(--text-secondary); }
-        .btn-logout:hover { border-color: #ff4d4d; color: #ff4d4d; }
-        .btn-back { background: transparent; border: 1px solid var(--accent-primary); color: var(--accent-primary); }
-        .btn-back:hover { background: rgba(0, 212, 255, 0.1); }
 
-        .viewer { 
-            display: none; position: fixed; top: 0; left: 0; 
-            width: 100%; height: 100%; background: #000; z-index: 9999; 
-            overflow: hidden;
-        }
-        
-        .viewer-header { 
-            height: 60px; background: #141927; display: flex; 
-            align-items: center; padding: 0 20px; justify-content: space-between; 
-            flex-wrap: wrap; gap: 10px;
-        }
-
+        .viewer { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; overflow: hidden; }
+        .viewer-header { height: 60px; background: #141927; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; }
         .error-message { color: #ff4d4d; font-size: 0.9rem; margin-top: 10px; display: none; }
         .error-message.show { display: block; }
     </style>
@@ -170,8 +65,6 @@
 <body>
     <div id="loginView" class="login-container">
         <div class="login-box">
-            <div id="loginLogoSkeleton" class="logo-skeleton"></div>
-            <img id="loginLogo" class="login-logo" alt="Logo">
             <h2 class="gradient-text" style="margin-bottom: 1.5rem; font-size: 1.8rem;">Portal GTC</h2>
             <form id="loginForm">
                 <input type="text" id="username" class="form-input" placeholder="Usuario" required>
@@ -184,193 +77,105 @@
 
     <div id="dashboardView" class="dashboard">
         <div class="header">
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div id="dashLogoSkeleton" class="dash-logo-skeleton"></div>
-                <img id="dashLogo" class="dash-logo" alt="Logo">
-                <h2 class="gradient-text">Bienvenido, <span id="displayUser"></span></h2>
-            </div>
+            <h2 class="gradient-text">Bienvenido, <span id="displayUser"></span></h2>
             <button class="btn btn-logout" onclick="logout()">Cerrar Sesión</button>
         </div>
-        <div id="adminArea"></div>
         <div id="reportGrid" class="reports-grid"></div>
     </div>
 
     <div id="viewerView" class="viewer">
         <div class="viewer-header">
             <h2 id="reportTitle" class="gradient-text" style="font-size: 1.2rem;"></h2>
-            <button class="btn btn-back" onclick="closeReport()">Volver</button>
+            <button class="btn" style="background:transparent; border:1px solid var(--accent-primary); color:var(--accent-primary);" onclick="closeReport()">Volver</button>
         </div>
-        <div id="reportFrameContainer" style="width: 100%; height: calc(100% - 60px);"></div>
+        <div id="safeReportContainer" style="width: 100%; height: calc(100% - 60px);"></div>
     </div>
 
-<script>
-    const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI/exec'; // ASEGÚRATE QUE TERMINE EN /exec
-    let currentUser = null;
+    <script>
+        // REEMPLAZA ESTA URL CON LA TUYA DE GOOGLE APPS SCRIPT
+        const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI/exec'; 
+        let currentUser = null;
 
-    window.onload = () => {
-        document.getElementById('loginForm').onsubmit = handleLogin;
-        fetchLogo();
-    };
+        window.onload = () => {
+            document.getElementById('loginForm').onsubmit = handleLogin;
+        };
 
-    async function fetchLogo() {
-        try {
-            const resp = await fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({action: 'getLogo'}) 
-            });
-            const res = await resp.json();
-            if(res.success) {
-                ['loginLogo', 'dashLogo'].forEach((id, i) => {
-                    const img = document.getElementById(id);
-                    if(img) {
-                        img.src = res.data.logoUrl;
-                        img.onload = () => {
-                            img.classList.add('loaded');
-                            const skeletons = [document.getElementById('loginLogoSkeleton'), document.getElementById('dashLogoSkeleton')];
-                            if(skeletons[i]) skeletons[i].style.display = 'none';
-                        };
-                    }
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginBtn');
+            const err = document.getElementById('loginError');
+            btn.disabled = true;
+            btn.innerHTML = 'Validando... <div class="spinner"></div>';
+            err.classList.remove('show');
+
+            try {
+                const user = document.getElementById('username').value;
+                const pass = document.getElementById('password').value;
+                const resp = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({action: 'login', username: user, password: pass})
                 });
-            }
-        } catch(e) { console.error("Error cargando logo"); }
-    }
-
-const SHEET_ID = '1xyW5L4JfGWPXELzinpWCBjNfjQRdsAB9SSRreQ0gS6U';
-
-function doGet(e) {
-  return ContentService.createTextOutput("Servicio Activo").setMimeType(ContentService.MimeType.TEXT);
-}
-
-function doPost(e) {
-  try {
-    // Si e.postData es indefinido, el fetch de GitHub no está mandando el body correctamente
-    if (!e.postData || !e.postData.contents) {
-      return createResponse(false, "Cuerpo de petición vacío");
-    }
-    
-    const params = JSON.parse(e.postData.contents);
-    const action = params.action;
-    
-    if (action === 'login') return handleLogin(params.username, params.password);
-    if (action === 'getReports') return getReports(params.username);
-    if (action === 'getLogo') return createResponse(true, "Logo", {logoUrl: 'logo.png'});
-    
-    return createResponse(false, "Acción desconocida: " + action);
-  } catch (error) {
-    return createResponse(false, "Error crítico en Apps Script: " + error.toString());
-  }
-}
-
-function handleLogin(username, password) {
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const sheet = ss.getSheetByName('Usuarios');
-  const data = sheet.getDataRange().getValues();
-  
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][0]).trim() === String(username).trim() && 
-        String(data[i][1]).trim() === String(password).trim()) {
-      return createResponse(true, "OK", {username: username, role: data[i][2] || 'user'});
-    }
-  }
-  return createResponse(false, "Usuario o contraseña incorrectos");
-}
-
-function getReports(username) {
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const userRole = getUserRole(username);
-  const sheet = ss.getSheets()[0]; // Primera hoja
-  const data = sheet.getDataRange().getValues();
-  const reports = [];
-  
-  for (let i = 1; i < data.length; i++) {
-    const userInSheet = String(data[i][0]).trim().toLowerCase();
-    if (userRole === 'admin' || userInSheet === String(username).toLowerCase()) {
-      reports.push({
-        name: data[i][1],
-        payload: Utilities.base64Encode(String(data[i][2]))
-      });
-    }
-  }
-  return createResponse(true, "OK", {reports: reports, isAdmin: userRole === 'admin'});
-}
-
-function getUserRole(username) {
-  const sheet = SpreadsheetApp.openById(SHEET_ID).getSheetByName('Usuarios');
-  const data = sheet.getDataRange().getValues();
-  for (let i = 1; i < data.length; i++) {
-    if (String(data[i][0]).trim().toLowerCase() === String(username).toLowerCase()) return data[i][2];
-  }
-  return 'user';
-}
-
-function createResponse(success, message, data = null) {
-  const out = {success: success, message: message, data: data};
-  return ContentService.createTextOutput(JSON.stringify(out)).setMimeType(ContentService.MimeType.JSON);
-}
-
-
-    async function loadReports() {
-        const grid = document.getElementById('reportGrid');
-        grid.innerHTML = '<p>Cargando reportes...</p>';
-        try {
-            const resp = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({action: 'getReports', username: currentUser})
-            });
-            const res = await resp.json();
-            if(res.success) {
-                grid.innerHTML = '';
-                res.data.reports.forEach(report => {
-                    const card = document.createElement('div');
-                    card.className = 'report-card';
-                    // USAMOS 'payload' que es como lo envía el nuevo Apps Script
-                    card.innerHTML = `
-                        <h3 style="margin-bottom: 1.5rem">${report.name}</h3>
-                        <button class="btn btn-primary" onclick="openReport('${report.payload}', '${report.name}')">Ver Reporte</button>
-                    `;
-                    grid.appendChild(card);
-                });
-                if(res.data.isAdmin) {
-                    document.getElementById('adminArea').innerHTML = `
-                        <div class="admin-notice">
-                            <p>Admin: <a href="${res.data.sheetUrl}" target="_blank" style="color:var(--accent-primary)">Gestionar Sheets</a></p>
-                        </div>`;
+                const res = await resp.json();
+                if(res.success) {
+                    currentUser = res.data.username;
+                    document.getElementById('displayUser').textContent = currentUser;
+                    document.getElementById('loginView').style.display = 'none';
+                    document.getElementById('dashboardView').classList.add('active');
+                    loadReports();
+                } else {
+                    err.textContent = res.message;
+                    err.classList.add('show');
                 }
-            } else {
-                grid.innerHTML = `<p>${res.message}</p>`;
+            } catch(e) { 
+                err.textContent = "Error de conexión con el servidor."; 
+                err.classList.add('show'); 
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Entrar al Portal';
             }
-        } catch(e) {
-            grid.innerHTML = '<p>Error al cargar la lista de reportes.</p>';
         }
-    }
 
-    function openReport(payload, name) {
-        document.getElementById('reportTitle').textContent = name;
-        const container = document.getElementById('reportFrameContainer');
-        container.innerHTML = '';
-        
-        // Creamos Shadow DOM cerrado para máxima protección
-        const shadow = container.attachShadow({mode: 'closed'});
-        const iframe = document.createElement('iframe');
-        
-        try {
-            // DECODIFICACIÓN CRÍTICA
-            iframe.src = atob(payload);
-            iframe.setAttribute('style', 'width:100%; height:100%; border:none; margin-bottom:-80px;');
+        async function loadReports() {
+            const grid = document.getElementById('reportGrid');
+            grid.innerHTML = '<p>Cargando reportes...</p>';
+            try {
+                const resp = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({action: 'getReports', username: currentUser})
+                });
+                const res = await resp.json();
+                if(res.success) {
+                    grid.innerHTML = '';
+                    res.data.reports.forEach(report => {
+                        const card = document.createElement('div');
+                        card.className = 'report-card';
+                        card.innerHTML = `
+                            <h3 style="margin-bottom:1.5rem">${report.name}</h3>
+                            <button class="btn btn-primary" onclick="openReport('${report.payload}', '${report.name}')">Ver Reporte</button>
+                        `;
+                        grid.appendChild(card);
+                    });
+                }
+            } catch(e) { grid.innerHTML = '<p>Error al cargar reportes.</p>'; }
+        }
+
+        function openReport(payload, name) {
+            document.getElementById('reportTitle').textContent = name;
+            const container = document.getElementById('safeReportContainer');
+            container.innerHTML = '';
+            
+            const shadow = container.attachShadow({mode: 'closed'});
+            const iframe = document.createElement('iframe');
+            iframe.src = atob(payload); 
+            iframe.style.width = "100%"; iframe.style.height = "100%"; iframe.style.border = "none";
+            iframe.setAttribute('referrerpolicy', 'no-referrer');
+            
             shadow.appendChild(iframe);
             document.getElementById('viewerView').style.display = 'block';
-        } catch(e) {
-            alert("Error al abrir el reporte. Payload inválido.");
         }
-    }
 
-    function closeReport() { 
-        document.getElementById('viewerView').style.display = 'none'; 
-        document.getElementById('reportFrameContainer').innerHTML = '';
-    }
-
-    function logout() { location.reload(); }
-</script>
-
+        function closeReport() { document.getElementById('viewerView').style.display = 'none'; }
+        function logout() { location.reload(); }
+    </script>
 </body>
 </html>
