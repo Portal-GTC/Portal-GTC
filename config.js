@@ -21,24 +21,24 @@ const LOGO_URL = 'logo.png';  // ← Cambia esto por la ruta de tu logo
 
 const USERS = {
     'admin': {
-        password: 'Franco13',  // ← Cambia esta contraseña
+        password: '766677',  // ← Cambia esta contraseña
         role: 'admin'  // admin puede agregar/eliminar reportes
     },
     'acarreon': {
-        password: 'Control10',  // ← Cambia esta contraseña
+        password: '233245234',  // ← Cambia esta contraseña
         role: 'user'
     },
     'salanis': {
-        password: 'Control20',  // ← Cambia esta contraseña
+        password: '2554254',  // ← Cambia esta contraseña
         role: 'user'
     },
     'ltapia': {
-        password: 'Control30',  // ← Cambia esta contraseña
+        password: '245789',  // ← Cambia esta contraseña
         role: 'user'
     }
     ,
     'ktrolle': {
-        password: 'Control40',  // ← Cambia esta contraseña
+        password: '23456789',  // ← Cambia esta contraseña
         role: 'user'
     }
     // Agrega más usuarios aquí siguiendo el mismo formato
