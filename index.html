@@ -203,64 +203,80 @@
         <div id="reportFrameContainer" style="width: 100%; height: calc(100% - 60px);"></div>
     </div>
 
-    <script>
-        const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI/exec';
-        let currentUser = null;
+<script>
+    const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT_AQUI/exec'; // ASEGÚRATE QUE TERMINE EN /exec
+    let currentUser = null;
 
-        window.onload = () => {
-            document.getElementById('loginForm').onsubmit = handleLogin;
-            fetchLogo();
-        };
+    window.onload = () => {
+        document.getElementById('loginForm').onsubmit = handleLogin;
+        fetchLogo();
+    };
 
-        async function fetchLogo() {
-            try {
-                const resp = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({action: 'getLogo'}) });
-                const res = await resp.json();
-                if(res.success) {
-                    ['loginLogo', 'dashLogo'].forEach((id, i) => {
-                        const img = document.getElementById(id);
+    async function fetchLogo() {
+        try {
+            const resp = await fetch(SCRIPT_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({action: 'getLogo'}) 
+            });
+            const res = await resp.json();
+            if(res.success) {
+                ['loginLogo', 'dashLogo'].forEach((id, i) => {
+                    const img = document.getElementById(id);
+                    if(img) {
                         img.src = res.data.logoUrl;
                         img.onload = () => {
                             img.classList.add('loaded');
                             const skeletons = [document.getElementById('loginLogoSkeleton'), document.getElementById('dashLogoSkeleton')];
                             if(skeletons[i]) skeletons[i].style.display = 'none';
                         };
-                    });
-                }
-            } catch(e) {}
-        }
-
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginBtn');
-            const err = document.getElementById('loginError');
-            btn.disabled = true;
-            btn.innerHTML = 'Accediendo... <div class="spinner"></div>';
-            
-            try {
-                const user = document.getElementById('username').value;
-                const pass = document.getElementById('password').value;
-                const resp = await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({action: 'login', username: user, password: pass})
+                    }
                 });
-                const res = await resp.json();
-                if(res.success) {
-                    currentUser = res.data.username;
-                    document.getElementById('displayUser').textContent = currentUser;
-                    document.getElementById('loginView').style.display = 'none';
-                    document.getElementById('dashboardView').classList.add('active');
-                    loadReports();
-                } else {
-                    err.textContent = res.message; err.classList.add('show');
-                }
-            } catch(e) { err.textContent = "Error de servidor"; err.classList.add('show'); }
-            btn.disabled = false; btn.textContent = 'Entrar al Portal';
-        }
+            }
+        } catch(e) { console.error("Error cargando logo"); }
+    }
 
-        async function loadReports() {
-            const grid = document.getElementById('reportGrid');
-            grid.innerHTML = '<p>Cargando reportes...</p>';
+    async function handleLogin(e) {
+        e.preventDefault();
+        const btn = document.getElementById('loginBtn');
+        const err = document.getElementById('loginError');
+        
+        btn.disabled = true;
+        btn.innerHTML = 'Accediendo... <div class="spinner"></div>';
+        err.classList.remove('show');
+        
+        try {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            
+            const resp = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({action: 'login', username: user, password: pass})
+            });
+            const res = await resp.json();
+            
+            if(res.success) {
+                currentUser = res.data.username;
+                document.getElementById('displayUser').textContent = currentUser;
+                document.getElementById('loginView').style.display = 'none';
+                document.getElementById('dashboardView').classList.add('active');
+                loadReports();
+            } else {
+                err.textContent = res.message; 
+                err.classList.add('show');
+            }
+        } catch(e) { 
+            err.textContent = "Error de servidor o conexión"; 
+            err.classList.add('show'); 
+        } finally {
+            btn.disabled = false; 
+            btn.textContent = 'Entrar al Portal';
+        }
+    }
+
+    async function loadReports() {
+        const grid = document.getElementById('reportGrid');
+        grid.innerHTML = '<p>Cargando reportes...</p>';
+        try {
             const resp = await fetch(SCRIPT_URL, {
                 method: 'POST',
                 body: JSON.stringify({action: 'getReports', username: currentUser})
@@ -271,32 +287,54 @@
                 res.data.reports.forEach(report => {
                     const card = document.createElement('div');
                     card.className = 'report-card';
-                    card.innerHTML = `<h3 style="margin-bottom: 1.5rem">${report.name}</h3>
-                        <button class="btn btn-primary" onclick="openReport('${report.url}', '${report.name}')">Ver Reporte</button>`;
+                    // USAMOS 'payload' que es como lo envía el nuevo Apps Script
+                    card.innerHTML = `
+                        <h3 style="margin-bottom: 1.5rem">${report.name}</h3>
+                        <button class="btn btn-primary" onclick="openReport('${report.payload}', '${report.name}')">Ver Reporte</button>
+                    `;
                     grid.appendChild(card);
                 });
                 if(res.data.isAdmin) {
-                    document.getElementById('adminArea').innerHTML = `<div class="admin-notice">
-                        <p>Admin: <a href="${res.data.sheetUrl}" target="_blank" style="color:var(--accent-primary)">Gestionar Sheets</a></p>
-                    </div>`;
+                    document.getElementById('adminArea').innerHTML = `
+                        <div class="admin-notice">
+                            <p>Admin: <a href="${res.data.sheetUrl}" target="_blank" style="color:var(--accent-primary)">Gestionar Sheets</a></p>
+                        </div>`;
                 }
+            } else {
+                grid.innerHTML = `<p>${res.message}</p>`;
             }
+        } catch(e) {
+            grid.innerHTML = '<p>Error al cargar la lista de reportes.</p>';
         }
+    }
 
-        function openReport(payload, name) {
-            document.getElementById('reportTitle').textContent = name;
-            const container = document.getElementById('reportFrameContainer');
-            container.innerHTML = '';
-            const shadow = container.attachShadow({mode: 'closed'});
-            const iframe = document.createElement('iframe');
+    function openReport(payload, name) {
+        document.getElementById('reportTitle').textContent = name;
+        const container = document.getElementById('reportFrameContainer');
+        container.innerHTML = '';
+        
+        // Creamos Shadow DOM cerrado para máxima protección
+        const shadow = container.attachShadow({mode: 'closed'});
+        const iframe = document.createElement('iframe');
+        
+        try {
+            // DECODIFICACIÓN CRÍTICA
             iframe.src = atob(payload);
             iframe.setAttribute('style', 'width:100%; height:100%; border:none; margin-bottom:-80px;');
             shadow.appendChild(iframe);
             document.getElementById('viewerView').style.display = 'block';
+        } catch(e) {
+            alert("Error al abrir el reporte. Payload inválido.");
         }
+    }
 
-        function closeReport() { document.getElementById('viewerView').style.display = 'none'; }
-        function logout() { location.reload(); }
-    </script>
+    function closeReport() { 
+        document.getElementById('viewerView').style.display = 'none'; 
+        document.getElementById('reportFrameContainer').innerHTML = '';
+    }
+
+    function logout() { location.reload(); }
+</script>
+
 </body>
 </html>
