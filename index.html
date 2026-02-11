@@ -367,257 +367,129 @@ iframe {
     </div>
 
     <script>
-        // ============================================
-        // WEB APP Google
-        // ============================================
-        const API_URL = 'https://script.google.com/macros/s/AKfycby-LAt1-k7VCsjfaa6eOXwUvNLm5ZT7FkxGLPCsDzSL9LfdVVoOq1j5RJ3Oo6j8pnW_/exec';
-        
-        // Variables globales
-        let sessionUser = "";
-        let sessionRole = "";
-        let logoCache = null; // Cache del logo
+    // Configuración: Reemplaza con la URL de tu Web App de Google
+    const SCRIPT_URL = 'TU_URL_DE_APPS_SCRIPT'; 
 
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Cargar logo inmediatamente
-            loadLogo();
-            
-            // Permitir login con Enter
-            document.getElementById('password').addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') handleLogin();
+    let currentUser = null;
+    let sessionToken = null;
+
+    // Elementos del DOM
+    const loginView = document.getElementById('loginView');
+    const dashboardView = document.getElementById('dashboardView');
+    const viewerView = document.getElementById('viewerView');
+    const reportGrid = document.getElementById('reportGrid');
+    const loginError = document.getElementById('loginError');
+    const loginBtn = document.getElementById('loginBtn');
+
+    // 1. Manejo de Login con Token
+    async function handleLogin(e) {
+        e.preventDefault();
+        const user = document.getElementById('username').value;
+        const pass = document.getElementById('password').value;
+
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = 'Iniciando sesión... <div class="spinner"></div>';
+        loginError.classList.remove('show');
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'login', username: user, password: pass })
             });
+            const result = await response.json();
+
+            if (result.success) {
+                currentUser = result.data.username;
+                sessionToken = result.data.token; // Guardamos el token
+                document.getElementById('displayUser').textContent = currentUser;
+                showDashboard();
+            } else {
+                loginError.textContent = result.message;
+                loginError.classList.add('show');
+            }
+        } catch (err) {
+            loginError.textContent = "Error de conexión con el servidor.";
+            loginError.classList.add('show');
+        } finally {
+            loginBtn.disabled = false;
+            loginBtn.textContent = 'Entrar al Portal';
+        }
+    }
+
+    // 2. Obtener Reportes (usando el token)
+    async function showDashboard() {
+        loginView.style.display = 'none';
+        dashboardView.classList.add('active');
+        reportGrid.innerHTML = '<p>Cargando reportes...</p>';
+
+        try {
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    action: 'getReports', 
+                    username: currentUser, 
+                    token: sessionToken 
+                })
+            });
+            const result = await response.json();
+
+            if (result.success) {
+                renderReports(result.data.reports);
+            }
+        } catch (err) {
+            reportGrid.innerHTML = '<p>Error al cargar los reportes.</p>';
+        }
+    }
+
+    function renderReports(reports) {
+        reportGrid.innerHTML = '';
+        reports.forEach(report => {
+            const card = document.createElement('div');
+            card.className = 'report-card';
+            card.innerHTML = `
+                <h3 style="margin-bottom:1rem">${report.name}</h3>
+                <button class="btn btn-primary" onclick="openReport('${report.payload}', '${report.name}')">
+                    Ver Reporte
+                </button>
+            `;
+            reportGrid.appendChild(card);
         });
+    }
 
-        // ============================================
-        // FUNCIONES DE API
-        // ============================================
+    // 3. Abrir Reporte con Shadow DOM (Máxima protección visual)
+    function openReport(payload, name) {
+        document.getElementById('reportTitle').textContent = name;
+        const container = document.getElementById('reportFrameContainer');
+        container.innerHTML = ''; // Limpiar previo
         
-        async function apiCall(action, data = {}) {
-            try {
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        action: action,
-                        ...data
-                    })
-                });
-                
-                return await response.json();
-            } catch (error) {
-                console.error('Error en llamada API:', error);
-                return {
-                    success: false,
-                    message: 'Error de conexión con el servidor'
-                };
-            }
-        }
-
-        async function loadLogo() {
-            // Si ya tenemos el logo en cache, usarlo inmediatamente
-            if (logoCache) {
-                setLogo(logoCache);
-                return;
-            }
-            
-            try {
-                const result = await apiCall('getLogo');
-                if (result.success && result.data.logoUrl) {
-                    logoCache = result.data.logoUrl;
-                    
-                    // Precargar la imagen
-                    const img = new Image();
-                    img.onload = () => {
-                        setLogo(logoCache);
-                    };
-                    img.onerror = () => {
-                        // Si falla, ocultar skeleton
-                        hideSkeleton();
-                    };
-                    img.src = logoCache;
-                } else {
-                    hideSkeleton();
-                }
-            } catch (error) {
-                console.log('Logo no disponible');
-                hideSkeleton();
-            }
-        }
+        // Crear Shadow Root en modo 'closed' para dificultar inspección
+        const shadow = container.attachShadow({mode: 'closed'});
         
-        function setLogo(url) {
-            const loginLogo = document.getElementById('loginLogo');
-            const dashLogo = document.getElementById('dashLogo');
-            const loginSkeleton = document.getElementById('loginLogoSkeleton');
-            const dashSkeleton = document.getElementById('dashLogoSkeleton');
-            
-            // Establecer la URL
-            loginLogo.src = url;
-            dashLogo.src = url;
-            
-            // Mostrar logos con animación
-            setTimeout(() => {
-                loginLogo.classList.add('loaded');
-                dashLogo.classList.add('loaded');
-                
-                // Ocultar skeletons
-                if (loginSkeleton) loginSkeleton.style.display = 'none';
-                if (dashSkeleton) dashSkeleton.style.display = 'none';
-            }, 50);
-        }
+        const iframe = document.createElement('iframe');
+        // Decodificamos el Base64 que viene del Apps Script
+        iframe.src = atob(payload); 
         
-        function hideSkeleton() {
-            const loginSkeleton = document.getElementById('loginLogoSkeleton');
-            const dashSkeleton = document.getElementById('dashLogoSkeleton');
-            
-            if (loginSkeleton) loginSkeleton.style.display = 'none';
-            if (dashSkeleton) dashSkeleton.style.display = 'none';
-        }
+        // Estilos y Atributos de seguridad
+        iframe.style.width = "100%";
+        iframe.style.height = "100%";
+        iframe.style.border = "none";
+        iframe.setAttribute('referrerpolicy', 'no-referrer');
+        iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-forms');
 
-        // ============================================
-        // LOGIN
-        // ============================================
-        
-        async function handleLogin() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const loginBtn = document.getElementById('loginBtn');
-            const errorMsg = document.getElementById('loginError');
-            
-            // Validación básica
-            if (!username || !password) {
-                showError('Por favor ingresa usuario y contraseña');
-                return;
-            }
-            
-            // Deshabilitar botón y mostrar cargando
-            loginBtn.disabled = true;
-            loginBtn.innerHTML = 'Entrando...<span class="spinner"></span>';
-            errorMsg.classList.remove('show');
-            
-            try {
-                // Llamar al backend
-                const result = await apiCall('login', { username, password });
-                
-                if (result.success) {
-                    sessionUser = result.data.username;
-                    sessionRole = result.data.role;
-                    
-                    // Cambiar a dashboard
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('dashboard').classList.add('active');
-                    
-                    // Si ya tenemos el logo cacheado, mostrarlo inmediatamente
-                    if (logoCache) {
-                        const dashSkeleton = document.getElementById('dashLogoSkeleton');
-                        if (dashSkeleton) dashSkeleton.style.display = 'block';
-                        setLogo(logoCache);
-                    }
-                    
-                    // Cargar reportes
-                    await loadReports();
-                } else {
-                    showError(result.message);
-                    loginBtn.disabled = false;
-                    loginBtn.innerHTML = 'Entrar';
-                }
-            } catch (error) {
-                showError('Error de conexión. Intenta de nuevo.');
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = 'Entrar';
-            }
-        }
+        shadow.appendChild(iframe);
+        viewerView.style.display = 'block';
+    }
 
-        function showError(message) {
-            const errorMsg = document.getElementById('loginError');
-            errorMsg.textContent = message;
-            errorMsg.classList.add('show');
-        }
+    function closeReport() {
+        viewerView.style.display = 'none';
+        document.getElementById('reportFrameContainer').innerHTML = '';
+    }
 
-        // ============================================
-        // REPORTES
-        // ============================================
-        
-        async function loadReports() {
-            const grid = document.getElementById('reportsGrid');
-            grid.innerHTML = '<p style="text-align: center; color: var(--text-secondary);">Cargando reportes...</p>';
-            
-            try {
-                const result = await apiCall('getReports', { username: sessionUser });
-                
-                if (!result.success) {
-                    grid.innerHTML = `<p style="color: #ff4d4d; text-align: center;">${result.message}</p>`;
-                    return;
-                }
-                
-                // Mostrar panel de admin si aplica
-                if (result.data.isAdmin) {
-                    document.getElementById('adminPanel').style.display = 'block';
-                    document.getElementById('sheetLink').href = result.data.sheetUrl;
-                }
-                
-                // Renderizar reportes
-                const reports = result.data.reports;
-                
-                if (reports.length === 0) {
-                    grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No se encontraron reportes asignados.</p>';
-                    return;
-                }
-                
-                grid.innerHTML = '';
-                
-                reports.forEach(report => {
-                    const card = document.createElement('div');
-                    card.className = 'report-card';
-                    card.innerHTML = `
-                        <h3 style="margin-bottom: 10px; color: var(--accent-primary)">${escapeHtml(report.name)}</h3>
-                        <p style="color: var(--text-secondary); font-size: 0.8rem; margin-bottom: 15px;">
-                            Usuario: ${escapeHtml(report.user)}
-                        </p>
-                        <button class="btn btn-primary" onclick="openViewer('${escapeHtml(report.url)}', '${escapeHtml(report.name)}')">
-                            Abrir Reporte
-                        </button>
-                    `;
-                    grid.appendChild(card);
-                });
-                
-            } catch (error) {
-                grid.innerHTML = '<p style="color: #ff4d4d; text-align: center;">Error al cargar reportes. Intenta de nuevo.</p>';
-            }
-        }
-
-        // ============================================
-        // VISOR
-        // ============================================
-        
-        function openViewer(url, title) {
-            document.getElementById('reportTitle').textContent = title;
-            document.getElementById('reportIframe').src = url;
-            document.getElementById('viewer').style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeViewer() {
-            document.getElementById('viewer').style.display = 'none';
-            document.getElementById('reportIframe').src = '';
-            document.body.style.overflow = 'auto';
-        }
-
-        // ============================================
-        // UTILIDADES
-        // ============================================
-        
-        function logout() {
-            sessionUser = '';
-            sessionRole = '';
-            location.reload();
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-    </script>
-</body>
-</html>
+    function logout() {
+        currentUser = null;
+        sessionToken = null;
+        dashboardView.classList.remove('active');
+        loginView.style.display = 'flex';
+        document.getElementById('loginForm').reset();
+    }
+</script>
